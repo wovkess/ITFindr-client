@@ -1,4 +1,4 @@
-import { Box } from '@chakra-ui/react';
+import { Box, Button} from '@chakra-ui/react';
 import { getDownloadURL, ref } from 'firebase/storage';
 import { DollarSign, Inbox, Phone } from 'lucide-react';
 import { useContext, useEffect, useState } from 'react';
@@ -9,6 +9,10 @@ import { Context } from '../index';
 import DialogWindow from './DialogWindow';
 import Loader from './Loader';
 import technologyImages from './TechnologyImages';
+import MessageWindow from './MessageWindow';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "src/LibComponents/ui/tooltip";
+
+
 const CardItem = ({ profiles, setProfiles }) => {
   const { store } = useContext(Context);
   const [users, setUsers] = useState([]);
@@ -90,7 +94,17 @@ const CardItem = ({ profiles, setProfiles }) => {
                 </div>
                 <img className="h-54 object-cover md:h-48 md:w-48 rounded-xl" src={profile.photo} alt='photo' />
                 <div className='flex items-center justify-left w-full text-slate-700 font-normal mt-1'>
-                  <div className='flex items-center'><Inbox className='size-4' /></div>
+                <TooltipProvider>
+										<Tooltip>
+											<TooltipTrigger>
+                        <div className='flex items-center'><MessageWindow btn={<Inbox className='size-4' />} profileUser={profileUser} /></div>
+											</TooltipTrigger>
+											<TooltipContent className="text-white bg-gray-800 border-none ml-10">
+												<p>Send email</p>
+											</TooltipContent>
+										</Tooltip>
+									</TooltipProvider>
+                  
                   <p className='text-sm ml-1'>{profileUser ? profileUser.email : 'Email not found'}</p>
                 </div>
                 
@@ -130,7 +144,6 @@ const CardItem = ({ profiles, setProfiles }) => {
                     <TechnologyImages technologies={profile.technologies} />
                   </div>)
                 }
-                {/* <Button onClick={store.sendEmail}>Send email</Button> */}
               </div>
             </div>
           </div>

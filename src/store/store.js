@@ -4,6 +4,8 @@ import AuthenticationService from '../services/AuthenticationService';
 import ProfileService from '../services/ProfileService';
 import UserService from '../services/UserService';
 import { GLOBAL_API_URL, LOCAL_API_URL } from '../utils/consts';
+import MailService from "../services/MailService";
+
 export default class Store{
     user = {}
     isAuth = false;
@@ -96,7 +98,7 @@ export default class Store{
     async checkAuth(){
         this.setIsLoading(true)
         try{
-            const response = await axios.get(`${LOCAL_API_URL || GLOBAL_API_URL}/refresh`, {withCredentials: true});
+            const response = await axios.get(`${GLOBAL_API_URL}/refresh`, {withCredentials: true});
             localStorage.setItem('token', response.data.accessToken);
             this.setAuth(true);
             this.setUser(response.data.user);
@@ -170,6 +172,15 @@ export default class Store{
             const res = await ProfileService.getTechnologiesList();
             return res;
         }catch(e) {
+            console.log(e);
+        }
+    }
+    async sendMail(from, to, subject, text){
+        try{
+            const res = await MailService.sendMail(from, to, subject, text);
+            console.log(res)
+            return res;
+        }catch(e){
             console.log(e)
         }
     }
