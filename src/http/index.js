@@ -1,7 +1,7 @@
 import axios from 'axios';
-import { GLOBAL_API_URL, LOCAL_API_URL } from '../utils/consts';
+import { GLOBAL_API_URL } from '../utils/consts';
 
-const baseURL = LOCAL_API_URL || GLOBAL_API_URL;
+const baseURL = GLOBAL_API_URL;
 
 const $api = axios.create({
     withCredentials: true, 
@@ -20,7 +20,7 @@ $api.interceptors.response.use((config) => {
     if(error.response.status === 401 && error.config && !error.config._isRetry){
         originalRequest._isRetry = true
         try{
-            const response = await axios.get(`${ LOCAL_API_URL || GLOBAL_API_URL }/refresh`, {withCredentials: true});
+            const response = await axios.get(`${GLOBAL_API_URL}/refresh`, {withCredentials: true});
             localStorage.setItem('token', response.data.accessToken)
             return $api.request(originalRequest)
         }
