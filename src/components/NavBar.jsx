@@ -93,21 +93,26 @@ const NavBar = () => {
 						try {
 							const imageStorageRef = ref(storage, `profile-photo/${profile.photo}`);
 							url = await getDownloadURL(imageStorageRef);
-
 						} catch (error) {
-							console.error('Error fetching profile photo:', error);
+							console.error('Ошибка при загрузке фотографии профиля:', error);
 						}
 					} else {
 						setUserEmail(store.userEmail);
-						setSpecialization('Visitor');
+						setSpecialization('Посетитель');
 					}
+
 					await setIsActivated(store.isActivated);
-					if (isActivated) {
+
+					if (store.isActivated) {
 						setPhoto(url);
 					} else {
-						const emptyPhotoRef = ref(storage, `profile-photo/empty.webp`);
-						const emptyPhotoUrl = await getDownloadURL(emptyPhotoRef);
-						setPhoto(emptyPhotoUrl)
+						try {
+							const emptyPhotoRef = ref(storage, `profile-photo/empty.webp`);
+							const emptyPhotoUrl = await getDownloadURL(emptyPhotoRef);
+							setPhoto(emptyPhotoUrl);
+						} catch (error) {
+							console.error('Ошибка при загрузке пустой фотографии профиля:', error);
+						}
 					}
 				}
 			}
