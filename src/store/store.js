@@ -1,16 +1,16 @@
 import axios from "axios";
 import { makeAutoObservable } from 'mobx';
 import AuthenticationService from '../services/AuthenticationService';
+import MailService from "../services/MailService";
 import ProfileService from '../services/ProfileService';
 import UserService from '../services/UserService';
-import { GLOBAL_API_URL, LOCAL_API_URL } from '../utils/consts';
-import MailService from "../services/MailService";
+import { GLOBAL_API_URL } from '../utils/consts';
 
-export default class Store{
+export default class Store {
     user = {}
     isAuth = false;
     isLoading = false;
-    error= {};
+    error = {};
     userEmail = '';
     userId = '';
     userInformation = {}
@@ -18,113 +18,114 @@ export default class Store{
     users = {}
 
 
-    constructor(){
+    constructor() {
         makeAutoObservable(this);
         this.isActivated = false;
     }
 
-    setAuth(bool){
+    setAuth(bool) {
         this.isAuth = bool;
     }
 
-    setIsLoading(bool){
+    setIsLoading(bool) {
         this.isLoading = bool;
     }
 
-    setUser(user){
+    setUser(user) {
         this.user = user;
     }
-    setActivated(isActivated){
+    setActivated(isActivated) {
         this.isActivated = isActivated;
     }
 
-    setError(error){
-        this.error = error; 
+    setError(error) {
+        this.error = error;
     }
-    
-    setUserId(userId){
+
+    setUserId(userId) {
         this.userId = userId;
     }
 
-    setUserEmail(userEmail){
+    setUserEmail(userEmail) {
         this.userEmail = userEmail;
     }
 
-    setUserInformation(userInformation){
+    setUserInformation(userInformation) {
         this.userInformation = userInformation;
     }
 
-    setProfiles(profiles){
+    setProfiles(profiles) {
         this.profiles = profiles;
     }
-    setUsers(users){
+    setUsers(users) {
         this.users = users;
     }
-    async login(email, password){
-        try{
+    async login(email, password) {
+        try {
             const response = await AuthenticationService.login(email, password);
             localStorage.setItem('token', response.data.accessToken);
             this.setAuth(true);
             this.setUser(response.data.user);
             this.setActivated(response.data.user.isActivated)
         }
-        catch(e){
+        catch (e) {
             this.setError(e)
             console.log(e)
         }
     }
-    async registration(email, password){
-        try{
+    async registration(email, password) {
+        try {
             const response = await AuthenticationService.registration(email, password);
             localStorage.setItem('token', response.data.accessToken);
             this.setAuth(true);
             this.setUser(response.data.user);
         }
-        catch(e){
+        catch (e) {
             this.setError(e)
         }
     }
-    async logout(){
-        try{
+    async logout() {
+        try {
             await AuthenticationService.logout();
             localStorage.removeItem('token');
             this.setAuth(false);
             this.setUser({});
         }
-        catch(e){
-            console.log (e)
+        catch (e) {
+            console.log(e)
         }
     }
-    async checkAuth(){
+    async checkAuth() {
         this.setIsLoading(true)
-        try{
-            const response = await axios.get(`${GLOBAL_API_URL}/refresh`, {withCredentials: true});
+        try {
+            const response = await axios.get(`${GLOBAL_API_URL}/refresh`, { withCredentials: true });
             localStorage.setItem('token', response.data.accessToken);
+            console.log(response.data.accessToken);
             this.setAuth(true);
             this.setUser(response.data.user);
             this.setActivated(response.data.user.isActivated);
             this.setUserEmail(response.data.user.email);
             this.setUserId(response.data.user.id);
         }
-        catch(e){
+        catch (e) {
             console.log(e)
         }
-        finally{
+        finally {
             this.setIsLoading(false)
         }
     }
-    async getProfile(userId){
-        try{
+    async getProfile(userId) {
+        try {
             const response = await ProfileService.getProfile(userId);
             return response;
-        }catch(e){
+        } catch (e) {
             console.log(e);
         }
     }
     async updateProfile(profileData) {
         try {
             const formData = new FormData();
-    
+
             // Добавляем только непустые поля в formData
             for (const key in profileData) {
                 if (profileData[key] !== '' && profileData[key] !== null && profileData[key] !== undefined) {
@@ -137,7 +138,7 @@ export default class Store{
                     }
                 }
             }
-    
+
             if (profileData.photo) {
                 formData.append('photo', profileData.photo);
             }
@@ -146,41 +147,41 @@ export default class Store{
             return response.data;
         } catch (error) {
             console.error('Error updating profile:', error);
-            throw error; 
+            throw error;
         }
     }
-    
-    async getAllProfiles(){
-        try{
+
+    async getAllProfiles() {
+        try {
             const response = await ProfileService.getAllProfiles();
             return response;
-        }catch(e){
+        } catch (e) {
             console.log(e)
         }
     }
-    
-    async getAllUsers(){
-        try{    
+
+    async getAllUsers() {
+        try {
             const response = await UserService.getAllUsers();
             return response;
-        }catch(e){
+        } catch (e) {
             console.log(e);
         }
     }
-    async getTechnologiesList(){
-        try{
+    async getTechnologiesList() {
+        try {
             const res = await ProfileService.getTechnologiesList();
             return res;
-        }catch(e) {
+        } catch (e) {
             console.log(e);
         }
     }
-    async sendMail(from, to, subject, text){
-        try{
+    async sendMail(from, to, subject, text) {
+        try {
             const res = await MailService.sendMail(from, to, subject, text);
             console.log(res)
             return res;
-        }catch(e){
+        } catch (e) {
             console.log(e)
         }
     }
